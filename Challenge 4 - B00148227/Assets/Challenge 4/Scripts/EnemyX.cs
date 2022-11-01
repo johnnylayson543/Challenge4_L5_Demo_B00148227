@@ -4,14 +4,24 @@ using UnityEngine;
 
 public class EnemyX : MonoBehaviour
 {
-    public float speed;
+    private float speed = 80;
     private Rigidbody enemyRb;
     private GameObject playerGoal;
+
+    private SpawnManagerX spawnManagerScript;
 
     // Start is called before the first frame update
     void Start()
     {
         enemyRb = GetComponent<Rigidbody>();
+        playerGoal = GameObject.Find("Player Goal");
+
+        // Set the speed of the balls by finding the .waveCount in the Spawn Manager (referred to the SpawnManagerX script in the GetComponent) multiplied by whatever speed you like.
+        spawnManagerScript = GameObject.Find("Spawn Manager").GetComponent<SpawnManagerX>();
+
+        speed += spawnManagerScript.waveCount * 20;
+        Debug.Log("Spawned an enemy with the speed of: " + speed);
+
     }
 
     // Update is called once per frame
@@ -20,12 +30,12 @@ public class EnemyX : MonoBehaviour
         // Set enemy direction towards player goal and move there
         Vector3 lookDirection = (playerGoal.transform.position - transform.position).normalized;
         enemyRb.AddForce(lookDirection * speed * Time.deltaTime);
-
     }
 
     private void OnCollisionEnter(Collision other)
     {
         // If enemy collides with either goal, destroy it
+        // If enemy collides with an other.gameObject.name (or other/another different gameObject (with different name)) who's name is set to "Enemy Goal" or "Player Goal"
         if (other.gameObject.name == "Enemy Goal")
         {
             Destroy(gameObject);
